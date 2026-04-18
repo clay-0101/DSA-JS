@@ -8,3 +8,16 @@ console.log(a);
 
 // 3. Kyun Possible Hai? (The 'Why')
 // "Ye isliye possible hai kyunki JavaScript ka default behavior thoda 'forgiving' (maaf karne wala) hai. Wo purane code (legacy code) ko support karne ke liye bina declaration ke variables allow kar deta hai."
+// console.log(Math.round(3.5)); 
+// console.log(Math.ceil(1.2));
+// console.log(Math.floor(1.2));
+// console.log(Math.trunc(4.2));
+// console.log(Math.pow(2,5));
+// console.log(Math.sqrt(625));
+// console.log(Math.cbrt(27));
+// console.log(Math.abs(-36));
+// console.log(Math.max(92,63,14,83,90));
+// console.log(Math.min(92,63,14,83,90));
+// console.log(Math.floor((Math.random()*9000)+1000));
+// let a = 34.234423
+// console.log(a.toFixed(3))
