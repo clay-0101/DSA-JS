@@ -40,15 +40,15 @@ for (let value of map.values()) {
 
 ### Methods ka Summary:
 
-| Method | Kaam kya karta hai |
-|---|---|
-| `map.set(key, value)` | Key-value pair add/update karo |
-| `map.get(key)` | Key ki value nikalo |
-| `map.delete(key)` | Key-value pair hata do |
-| `map.has(key)` | Check karo key exist karti hai ya nahi |
-| `map.size` | Total kitne pairs hain |
-| `map.keys()` | Saari keys ka iterator |
-| `map.values()` | Saari values ka iterator |
+| Method                | Kaam kya karta hai                     |
+| --------------------- | -------------------------------------- |
+| `map.set(key, value)` | Key-value pair add/update karo         |
+| `map.get(key)`        | Key ki value nikalo                    |
+| `map.delete(key)`     | Key-value pair hata do                 |
+| `map.has(key)`        | Check karo key exist karti hai ya nahi |
+| `map.size`            | Total kitne pairs hain                 |
+| `map.keys()`          | Saari keys ka iterator                 |
+| `map.values()`        | Saari values ka iterator               |
 
 ---
 
@@ -316,27 +316,117 @@ Answer: 'a'
 
 ## 📌 Map vs Set vs Object — Kab Kya Use Karo?
 
-| Situation | Best Choice |
-|---|---|
-| Sirf unique values store karni hain | **Set** |
-| Existence/presence check karna hai | **Set** |
-| Key-value pairs store karni hain | **Map** |
-| Frequency / count track karni hai | **Map** |
-| Two Sum jaisi index mapping chahiye | **Map** |
-| Simple string keys, normal object kaam kare | **Object** |
+| Situation                                   | Best Choice |
+| ------------------------------------------- | ----------- |
+| Sirf unique values store karni hain         | **Set**     |
+| Existence/presence check karna hai          | **Set**     |
+| Key-value pairs store karni hain            | **Map**     |
+| Frequency / count track karni hai           | **Map**     |
+| Two Sum jaisi index mapping chahiye         | **Map**     |
+| Simple string keys, normal object kaam kare | **Object**  |
 
 ---
 
 ## ⚡ Map vs Object — Quick Difference
 
-| Feature | Map | Object |
-|---|---|---|
-| Key types | Kuch bhi (number, object, etc.) | Sirf string/symbol |
-| Order | Insertion order maintain | Mostly maintain (modern JS) |
-| Size | `map.size` direct milta hai | `Object.keys(obj).length` |
-| Iteration | `for...of` direct kaam karta hai | Thoda extra kaam |
-| Performance | Better for frequent add/delete | Simple cases ke liye theek |
+| Feature     | Map                              | Object                      |
+| ----------- | -------------------------------- | --------------------------- |
+| Key types   | Kuch bhi (number, object, etc.)  | Sirf string/symbol          |
+| Order       | Insertion order maintain         | Mostly maintain (modern JS) |
+| Size        | `map.size` direct milta hai      | `Object.keys(obj).length`   |
+| Iteration   | `for...of` direct kaam karta hai | Thoda extra kaam            |
+| Performance | Better for frequent add/delete   | Simple cases ke liye theek  |
 
 ---
 
 > ✍️ **Tip:** Jab bhi problem mein **"count karo"**, **"index yaad rakho"**, ya **"kisi cheez ko kisi aur cheez se map karo"** — seedha **Map** yaad karo! 🚀
+
+
+Yeh raha bhai, seedha copy-paste kar apni `map.md` mein:
+
+---
+
+## 🔴 Question 6 — Most Frequent Even Element Dhundho
+
+### ❓ Problem:
+Array mein jo **even number sabse zyada baar aaya** ho usse return karo.  
+Agar do even numbers ki frequency same ho toh **chota wala** return karo.  
+Koi even number nahi hai toh `-1` return karo.
+
+```javascript
+class Solution {
+    mostFrequentEven(nums) {
+        // Implement your solution here
+       let map = new Map()
+       let max = 0 , ele = -1
+       for(let i = 0 ; i < nums.length ; i++){
+        map.set(nums[i], (map.get(nums[i]) || 0) + 1)
+       }
+       for(let key of map.keys()){
+        if(key % 2 == 0){
+            let currentFreq = map.get(key)
+            if(currentFreq > max){
+                max = currentFreq
+                ele = key
+            }
+            else if(currentFreq == max){
+                if(ele == -1 || key < ele){
+                    ele = key
+                }
+            }
+        }
+       }
+       return ele
+    }
+}
+```
+
+### 📊 Output:
+```
+Input:  nums = [0, 1, 2, 2, 4, 4, 1]
+Output: 2
+
+Input:  nums = [4, 4, 4, 9, 2, 2]
+Output: 4
+
+Input:  nums = [29, 47, 21, 41, 13, 37, 25, 7]
+Output: -1   // koi even number nahi
+```
+
+### 🧠 Logic Samjho:
+
+**Step 1 — Sabka frequency count karo (Map mein):**
+```
+nums = [0, 1, 2, 2, 4, 4, 1]
+
+Map: { 0→1, 1→2, 2→2, 4→2 }
+```
+
+**Step 2 — Sirf even keys pe dhyan do:**
+```
+0 → even ✅  freq=1  max=1, ele=0
+1 → odd  ❌  skip
+2 → even ✅  freq=2  2 > 1 → max=2, ele=2
+4 → even ✅  freq=2  2 == 2 (tie!) → 4 > 2 toh ele nahi badla
+
+Answer: 2 ✅
+```
+
+### 🧠 Tie ka Case Samjho:
+```javascript
+else if(currentFreq == max){
+    if(ele == -1 || key < ele){
+        ele = key   // chota wala rakho
+    }
+}
+```
+- Jab do even numbers ki **frequency same** ho
+- Toh jo **key choti** hai woh `ele` mein store hogi
+- `ele == -1` check isliye kiya kyunki initial value `-1` hai — pehli even milne pe seedha store karo
+
+### 💡 Is Question mein Map ka Fayda:
+- Pehle **ek loop** mein saari frequencies store kar li Map mein
+- Doosre loop mein sirf **even keys filter** ki aur max dhundha
+- Bina Map ke yeh **O(n²)** hota, Map se **O(n)** mein ho gaya ⚡
+
+---
