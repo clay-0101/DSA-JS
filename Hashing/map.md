@@ -430,3 +430,311 @@ else if(currentFreq == max){
 - Bina Map ke yeh **O(n²)** hota, Map se **O(n)** mein ho gaya ⚡
 
 ---
+Yeh raha bhai, seedha copy-paste kar apni `map.md` mein:
+
+---
+
+## 🔴 Question 7 — Kth Distinct String Dhundho
+
+### ❓ Problem:
+Ek array of strings aur ek integer `k` diya hai. Jo string array mein **sirf ek baar** aayi ho woh "distinct" hai. Array ki **Kth distinct string** return karo. Agar itni distinct strings nahi hain toh `"None"` return karo.
+
+```javascript
+class Solution {
+    kthDistinct(arr, k) {
+        let map = new Map()
+        let eles = []
+        for (let i = 0; i < arr.length; i++) {
+            let curr = arr[i]
+            map.set(curr, (map.get(curr) || 0) + 1)
+        }
+        let count = 0
+        for (let key of map.keys()) {
+            if (map.get(key) == 1) {
+                count++
+                if (count == k) {
+                    return key
+                }
+            }
+        }
+        return 'None'
+    }
+}
+```
+
+### 📊 Output:
+```
+Input:  arr=["d","b","c","b","c","a"], k=2
+Output: "a"
+
+Input:  arr=[2,1,3,3,2], k=1
+Output: 1
+
+Input:  arr=[1,2,3,4], k=5
+Output: 'None'
+```
+
+### 🧠 Logic Samjho:
+
+**Step 1 — Frequency Map banao:**
+```
+arr = ["d","b","c","b","c","a"]
+
+Map: { "d"→1, "b"→2, "c"→2, "a"→1 }
+```
+
+**Step 2 — Sirf freq=1 wale count karo:**
+```
+"d" → freq=1 ✅  count=1  (k=2, abhi nahi mila)
+"b" → freq=2 ❌  skip
+"c" → freq=2 ❌  skip
+"a" → freq=1 ✅  count=2 == k ✅ return "a"
+
+Answer: "a"
+```
+
+### 💡 Map ka Order kyun Important hai:
+Map **insertion order** maintain karta hai — elements usi order mein traverse honge jisme array mein the. Isliye Kth distinct correctly milta hai! ✅
+
+---
+
+---
+
+## 🔴 Question 8 — Candies Distribute Karo
+
+### ❓ Problem:
+`n` candies hain, `k` children hain, aur `candies` array mein har candy ka type diya hai.  
+**Rule:** Har child ko **exactly k distinct types** ki candy milegi.  
+Ek candy sirf ek hi child ko di ja sakti hai — reuse nahi hogi.  
+Count karo **maximum kitne children** ko complete distribution mil sakti hai.
+
+```javascript
+class Solution {
+    distributeCandies(n, k, candies) {
+        let map = new Map()
+        let count = 0
+        let child = 0
+        for (let i = 0; i < candies.length; i++) {
+            let curr = candies[i]
+            map.set(curr, (map.get(curr) || 0) + 1)
+        }
+        if (map.size >= k) {
+            while (map.size > 0) {
+                for (let key of map.keys()) {
+                    if (count == k) {
+                        child++
+                        count = 0
+                        break;
+                    }
+                    if (map.has(key) && map.get(key) > 0) {
+                        count++
+                        map.set(key, (map.get(key)) - 1)
+                    } else if (map.get(key) == 0) {
+                        map.delete(key)
+                    }
+                }
+            }
+        } else {
+            return child
+        }
+        return child
+    }
+}
+```
+
+### 📊 Output:
+```
+Input:  n=7, k=3, candies=[1,1,2,2,3,3,4]
+Output: 2
+
+Input:  n=6, k=2, candies=[1,1,1,1,1,1]
+Output: 0   // sirf 1 type hai, k=2 chahiye
+```
+
+### 🧠 Logic Samjho:
+
+**Step 1 — Frequency Map banao:**
+```
+candies = [1,1,2,2,3,3,4]
+
+Map: { 1→2, 2→2, 3→2, 4→1 }
+```
+
+**Step 2 — Check karo `map.size >= k`:**
+```
+map.size=4, k=3 → 4 >= 3 ✅ aage badho
+```
+Agar `map.size < k` → directly `0` return, ek bhi round possible nahi.
+
+**Step 3 — Round simulate karo:**
+```
+Round 1:
+  key=1 → count=1, map: {1→1, ...}
+  key=2 → count=2, map: {2→1, ...}
+  key=3 → count=3 == k → child=1, count=0, break ✅
+
+Round 2:
+  key=1 → count=1, map: {1→0, ...}
+  key=2 → count=2, map: {2→0, ...}
+  key=3 → count=3 == k → child=2, count=0, break ✅
+
+Round 3:
+  key=1 → freq=0, delete
+  key=2 → freq=0, delete
+  key=3 → freq=0, delete
+  key=4 → count=1
+  map khaali → while loop band
+
+Answer: 2 ✅
+```
+
+---
+
+---
+
+## 🔴 Question 9 — Word Pattern Match Karo
+
+### ❓ Problem:
+Ek `pattern` string aur ek `s` string diya hai.  
+Check karo kya `s` ke words `pattern` ke characters ko **one-to-one follow** karte hain.  
+- Har character exactly ek word se map hona chahiye.
+- Do alag characters same word se map nahi hone chahiye.
+
+```javascript
+class Solution {
+    wordPattern(pattern, s) {
+        let arr = s.split(' ')
+        let set = new Set(arr)
+        let uniqueArr = Array.from(set)
+        let map = new Map()
+        let count = 0
+
+        for (let i = 0; i < uniqueArr.length; i++) {
+            map.set(pattern[i], uniqueArr[i])
+        }
+
+        for (let i = 0; i < pattern.length; i++) {
+            let curr = pattern[i]
+            if (map.get(curr) == arr[i]) {
+                count++
+            }
+        }
+
+        if (count == pattern.length) return true;
+        else return false
+    }
+}
+```
+
+### 📊 Output:
+```
+Input:  pattern="abba", s="dog cat cat dog"
+Output: true
+
+Input:  pattern="abba", s="dog cat cat fish"
+Output: false
+
+Input:  pattern="aa", s="dog dog"
+Output: true
+```
+
+### 🧠 Logic Samjho:
+
+**Step 1 — Unique words nikalo Set se:**
+```
+s = "dog cat cat dog"
+arr = ["dog","cat","cat","dog"]
+set = {"dog","cat"}
+uniqueArr = ["dog","cat"]
+```
+
+**Step 2 — Pattern characters ko unique words se map karo:**
+```
+pattern = "abba"
+uniqueArr = ["dog","cat"]
+
+map: { 'a'→"dog", 'b'→"cat" }
+```
+
+**Step 3 — Verify karo har position pe:**
+```
+i=0: pattern[0]='a' → map.get('a')="dog" == arr[0]="dog" ✅ count=1
+i=1: pattern[1]='b' → map.get('b')="cat" == arr[1]="cat" ✅ count=2
+i=2: pattern[2]='b' → map.get('b')="cat" == arr[2]="cat" ✅ count=3
+i=3: pattern[3]='a' → map.get('a')="dog" == arr[3]="dog" ✅ count=4
+
+count=4 == pattern.length=4 → return true ✅
+```
+
+---
+
+---
+
+## 🔴 Question 10 — Duplicate aur Missing Number Dhundho
+
+### ❓ Problem:
+Array mein `1` se `n` tak numbers hone chahiye. Lekin:
+- **Ek number duplicate** hai (2 baar aaya)
+- **Ek number missing** hai (aaya hi nahi)
+
+Dono return karo `[duplicate, missing]` order mein.
+
+```javascript
+class Solution {
+    findErrorNums(nums) {
+        let missing = 0
+        let duplicate = 0
+        let map = new Map()
+        for (let i = 0; i < nums.length; i++) {
+            let curr = nums[i]
+            map.set(curr, (map.get(curr) || 0) + 1)
+        }
+        for (let i = 1; i <= nums.length; i++) {
+            if (!map.has(i)) {
+                missing = i
+            }
+            if (map.get(i) > 1) {
+                duplicate = i
+            }
+        }
+        return [duplicate, missing]
+    }
+}
+```
+
+### 📊 Output:
+```
+Input:  nums=[1,2,2,4]
+Output: [2, 3]   // 2 duplicate hai, 3 missing hai
+
+Input:  nums=[1,1,3]
+Output: [1, 2]   // 1 duplicate hai, 2 missing hai
+```
+
+### 🧠 Logic Samjho:
+
+**Step 1 — Frequency Map banao:**
+```
+nums = [1,2,2,4]
+
+Map: { 1→1, 2→2, 4→1 }
+```
+
+**Step 2 — 1 se n tak loop lagao aur check karo:**
+```
+i=1: map.has(1) ✅, freq=1  → normal
+i=2: map.has(2) ✅, freq=2  → duplicate=2 ✅
+i=3: map.has(3) ❌          → missing=3 ✅
+i=4: map.has(4) ✅, freq=1  → normal
+
+Answer: [2, 3] ✅
+```
+
+### 💡 2 Cheezein ek saath dhundhi:
+```javascript
+if (!map.has(i))      // missing: 1 to n mein se jo Map mein nahi
+if (map.get(i) > 1)   // duplicate: jiska count 2 hai
+```
+Ek hi loop mein **dono answers** nikal aate hain — clean aur efficient! ⚡
+
+---
