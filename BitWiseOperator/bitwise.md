@@ -417,3 +417,135 @@ console.log(arr[1] + arr[2] + arr[3]);
 | NOT      |  `~`   | Bits ulte karo | `~5 = -6` |
 | Right Shift | `>>` | 2 se divide | `16 >> 1 = 8` |
 | Left Shift  | `<<` | 2 se multiply | `3 << 1 = 6` |
+
+
+Yeh lo, seedha copy-paste karo apni `bitwise.md` mein:
+
+---
+
+```md
+---
+
+## Q9 — Swap Two Numbers using XOR (Bina Third Variable ke)
+
+```javascript
+function swapNumbers(a, b) {
+    a = a ^ b
+    b = a ^ b
+    a = a ^ b
+    return [a, b]
+}
+```
+
+**Logic (XOR trick):**
+
+XOR ki property hoti hai:
+- `x ^ x = 0` (same value XOR karo → 0)
+- `x ^ 0 = x` (kisi bhi value ko 0 se XOR karo → wahi value)
+
+**Trace (a=5, b=9):**
+
+```
+5  =  0101
+9  =  1001
+```
+
+| Step | Operation | a (binary) | b (binary) | a (decimal) | b (decimal) |
+|------|-----------|-----------|-----------|-------------|-------------|
+| Start | — | 0101 | 1001 | 5 | 9 |
+| a = a^b | 0101^1001 | 1100 | 1001 | 12 | 9 |
+| b = a^b | 1100^1001 | 1100 | 0101 | 12 | 5 |
+| a = a^b | 1100^0101 | 1001 | 0101 | 9 | 5 |
+
+**✅ Output: `[9, 5]`**
+
+---
+
+## Q10 — Check Even or Odd using Bitwise AND
+
+```javascript
+function checkEvenOrOdd(num) {
+    if ((num & 1) == 0) {
+        return 'Even'
+    } else return 'Odd'
+}
+```
+
+**Logic:**
+
+Kisi bhi number ka **last bit** batata hai wo even hai ya odd:
+- Last bit `0` → Even
+- Last bit `1` → Odd
+
+`num & 1` se sirf last bit check hoti hai:
+
+```
+4  =  100  →  4 & 1 = 000 = 0  →  Even
+7  =  111  →  7 & 1 = 001 = 1  →  Odd
+```
+
+| num | Binary | num & 1 | Result |
+|-----|--------|---------|--------|
+|  4  |  100   |    0    |  Even  |
+|  7  |  111   |    1    |  Odd   |
+
+**✅ Output:**
+- `checkEvenOrOdd(4)` → `Even`
+- `checkEvenOrOdd(7)` → `Odd`
+
+---
+
+## Q11 — Power of Two Check using Bitwise AND
+
+```javascript
+function isPowerOfTwo(n) {
+    if (n == 0) return false
+    else if ((n & (n - 1)) == 0) return true
+    else return false
+}
+```
+
+**Logic:**
+
+Power of 2 numbers binary mein aisa dikhte hain — sirf **ek** bit ON hoti hai:
+
+```
+1  =  0001
+2  =  0010
+4  =  0100
+8  =  1000
+```
+
+Agar `n` power of 2 hai, to `n-1` ke saare bits neeche hote hain:
+
+```
+8    =  1000
+8-1  =  0111
+-----------
+8 & 7 = 0000  →  0  ✅ Power of 2!
+
+6    =  0110
+6-1  =  0101
+-----------
+6 & 5 = 0100  →  4  ❌ Power of 2 nahi
+```
+
+**Trace:**
+
+| n  | n-1 | n & (n-1) | Result |
+|----|-----|-----------|--------|
+|  0 |  —  |     —     | false (special case) |
+|  1 |  0  |     0     | true  |
+|  4 |  3  |     0     | true  |
+|  6 |  5  |     4     | false |
+| 16 | 15  |     0     | true  |
+
+**✅ Output:**
+- `isPowerOfTwo(0)`  → `false`
+- `isPowerOfTwo(1)`  → `true`
+- `isPowerOfTwo(4)`  → `true`
+- `isPowerOfTwo(6)`  → `false`
+- `isPowerOfTwo(16)` → `true`
+```
+
+---
