@@ -193,3 +193,192 @@ GCD(12, 30) = 6  ✓
 **Note:** Yeh function sirf min aur max ka GCD deta hai — pure array ka GCD nahi. Agar poore array ka GCD chahiye toh har adjacent pair pe gcd call karni hogi.
 
 **✅ Output: `6`**
+
+---
+
+## Q13 — GCD : Method 3 — Modulo / Euclidean (Sabse Efficient)
+
+```javascript
+// Method 3: Modulo — Euclidean Algorithm
+function gcd(a, b) {
+    if (b == 0) return a          // Base case: b zero ho gaya → a hi GCD hai
+    if (a > b) return gcd(b, a % b)
+    return gcd(a, b % a)
+}
+```
+
+**Logic:** `%` (modulo) operator ek hi step mein number ko bahut chhhota kar deta hai. Yeh Euclid ka original algorithm hai — 300 BC se chala aa raha hai.
+
+**Property:** `GCD(a, b) = GCD(b, a % b)`
+
+Matlab bade number ko chhote se divide karo, remainder aur chhota number — yahi nayi pair ban jaati hai. Remainder hamesha chhota hota hai, isliye bahut jaldi base case aa jaata hai.
+
+**Trace (a=10, b=48):**
+
+```
+gcdMod(10, 48) → b>a  → gcdMod(10, 48%10) = gcdMod(10, 8)
+gcdMod(10, 8)  → a>b  → gcdMod(8,  10%8)  = gcdMod(8,  2)
+gcdMod(8,  2)  → a>b  → gcdMod(2,  8%2)   = gcdMod(2,  0)
+gcdMod(2,  0)  → b==0 → BASE CASE → return 2
+```
+
+**✅ Output: `2`** (sirf **4 calls** mein!)
+
+---
+
+## Q14 — GCD : Method 2 revisited — Subtraction vs Modulo Comparison
+
+```javascript
+// Method 2: Subtraction
+let a = 10, b = 48
+function gcd(a, b) {
+    if (a == b) return a          // Base case: dono equal → wahi GCD
+    if (a > b) return gcd(a - b, b)
+    return gcd(a, b - a)
+}
+console.log(gcd(a, b));
+```
+
+**Trace (a=10, b=48):**
+
+```
+gcdSub(10, 48) → b>a → gcdSub(10, 38)
+gcdSub(10, 38) → b>a → gcdSub(10, 28)
+gcdSub(10, 28) → b>a → gcdSub(10, 18)
+gcdSub(10, 18) → b>a → gcdSub(10, 8)
+gcdSub(10, 8)  → a>b → gcdSub(2,  8)
+gcdSub(2,  8)  → b>a → gcdSub(2,  6)
+gcdSub(2,  6)  → b>a → gcdSub(2,  4)
+gcdSub(2,  4)  → b>a → gcdSub(2,  2)
+gcdSub(2,  2)  → a==b → BASE CASE → return 2
+```
+
+**✅ Output: `2`** (lekin **9 calls** mein)
+
+---
+
+## Dono Methods ka Direct Comparison
+
+|                 | Modulo Method       | Subtraction Method       |
+| --------------- | ------------------- | ------------------------ |
+| Base case       | `b == 0`            | `a == b`                 |
+| Reduction       | `a % b` (remainder) | `max - min` (difference) |
+| Time Complexity | **O(log min(a,b))** | **O(max(a,b) / gcd)**    |
+| Speed           | ⚡ Fast              | 🐢 Slow on large numbers  |
+
+**Real numbers pe fark:**
+
+| Input               | Modulo calls | Subtraction calls |
+| ------------------- | ------------ | ----------------- |
+| gcd(10, 48)         | 4            | 9                 |
+| gcd(56, 98)         | 4            | 5                 |
+| gcd(123456, 789012) | 12           | 32+               |
+
+**Kyun modulo itna fast hai?**
+
+```
+Subtraction: 48 → 38 → 28 → 18 → 8  (ek ek ghata raha hai, slow)
+Modulo:      48 → 8              (ek hi step mein! 48%10 = 8)
+```
+
+`%` operator ek hi step mein woh kaam karta hai jo subtraction ko kayi steps mein karna padta — isliye log(n) complexity aati hai.
+
+**Conclusion:** Jab bhi GCD nikalna ho — **Modulo method use karo**. Subtraction method sirf samajhne ke liye achhi hai, production mein hamesha Euclidean (modulo) prefer karte hain.
+
+---
+
+## Sieve of Eratosthenes — n tak ke saare prime numbers nikalo
+
+```javascript
+let n = 50  // (prompt se aata hai)
+
+let prime = new Array(n + 1).fill(true)  // sab ko pehle prime maan lo
+
+for (let i = 2; i <= Math.sqrt(n); i++) {
+    if (prime[i]) {
+        for (let j = i * i; j <= n; j += i) {
+            prime[j] = false    // i ka multiple → composite hai
+        }
+    }
+}
+
+for (let i = 2; i < prime.length-1; i++) {
+    if (prime[i]) {
+        process.stdout.write(i + ' ')
+    }
+}
+```
+
+**Logic — Sieve kya hai?**
+
+Sieve ka matlab hota hai "chalni" — us chalni se prime numbers ko baaki sab se alag karna. Idea simple hai:
+
+Pehle sab numbers ko prime maan lo. Phir 2 se shuru karo — jo bhi prime milta hai uske **saare multiples ko mark karo false** (kyunki woh prime nahi ho sakte — unka ek factor toh pehle se hai). End mein jo bhi `true` hain woh saare primes hain.
+
+**2 key tricks jo isko efficient banate hain:**
+
+**Trick 1 — `i*i` se start karo, `i*2` se nahi:**
+
+```
+i=2 ke liye: 4, 6, 8, 10... (i*i = 4 se shuru)
+i=3 ke liye: 9, 12, 15... (i*i = 9 se shuru)
+             ↑
+             6 skip kiya — 6 = 2×3, ye already i=2 ne mark kar diya tha!
+```
+
+`j = i*i` isliye — `i` se chhoti saari values already pehle ke kisi prime ne mark kar di hoti hain.
+
+**Trick 2 — `Math.sqrt(n)` tak hi outer loop:**
+
+```
+n=50 → sqrt(50) ≈ 7.07 → i sirf 2,3,5,7 tak chalega
+```
+
+Kyunki agar koi number `n` composite hai aur uska ek factor `sqrt(n)` se bada hai, toh doosra factor zaroor `sqrt(n)` se chhota hoga — aur usne pehle hi us number ko mark kar diya hoga.
+
+**Step-by-step trace (n=20):**
+
+```
+Init:   [2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20]
+        (sab true)
+
+i=2 (prime[2]=true):
+  j = 4,6,8,10,12,14,16,18,20 → false
+  [2 3 x 5 x 7 x 9  x 11  x 13  x 15  x 17  x 19  x]
+
+i=3 (prime[3]=true):
+  j = 9,12,15,18 → false  (4,6 pehle hi mark the)
+  [2 3 x 5 x 7 x x  x 11  x 13  x  x  x 17  x 19  x]
+
+i=4: prime[4]=false → skip
+sqrt(20) ≈ 4.47 → loop khatam
+
+Final primes: 2 3 5 7 11 13 17 19
+```
+
+**Array state visualization:**
+
+```
+Index:   0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20
+Start: [ F  F  T  T  T  T  T  T  T  T   T  T  T  T  T  T  T  T  T  T  T]
+i=2:   [ F  F  T  T  F  T  F  T  F  T   F  T  F  T  F  T  F  T  F  T  F]
+i=3:   [ F  F  T  T  F  T  F  T  F  F   F  T  F  T  F  F  F  T  F  T  F]
+                ↑  ↑     ↑     ↑        ↑        ↑              ↑     ↑
+             Yeh sab TRUE hain → Primes!
+```
+
+**Time & Space Complexity:**
+
+| | Complexity | Matlab |
+|--|-----------|--------|
+| Time | **O(n log log n)** | Almost linear — bahut fast |
+| Space | **O(n)** | n size ka array chahiye |
+
+Single number ke liye prime check karna `O(√n)` hota hai. Sieve se ek saath **saare** primes `O(n log log n)` mein milte hain — agar bohot saare primes chahiye toh sieve hamesha better hai.
+
+**✅ Output:**
+```
+n=20 → 2 3 5 7 11 13 17 19
+n=30 → 2 3 5 7 11 13 17 19 23 29
+n=50 → 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47
+```
