@@ -382,3 +382,117 @@ n=20 → 2 3 5 7 11 13 17 19
 n=30 → 2 3 5 7 11 13 17 19 23 29
 n=50 → 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47
 ```
+---
+
+## Q15 — Integer Square Root using Binary Search
+
+Do alag methods hain — dono ka output same hai, fark sirf condition mein hai.
+
+---
+
+### Method 1 — `mid <= Math.floor(n / mid)` (Division-based)
+
+```javascript
+function sqr(n) {
+    let first = 1, last = n, ans = 0
+    while (first <= last) {
+        let mid = Math.floor((first + last) / 2)
+        if (mid <= Math.floor(n / mid)) {  // ← division se check
+            ans = mid
+            first = mid + 1
+        } else {
+            last = mid - 1
+        }
+    }
+    return ans
+}
+```
+
+### Method 2 — `mid * mid <= n` (Multiplication-based)
+
+```javascript
+function mySqrt(n) {
+    let first = 1, last = n, ans = 0
+    while (first <= last) {
+        let mid = Math.floor((first + last) / 2)
+        if (mid * mid <= n) {              // ← multiplication se check
+            ans = mid
+            first = mid + 1
+        } else {
+            last = mid - 1
+        }
+    }
+    return ans
+}
+```
+
+---
+
+**Logic — Binary Search pe kyon?**
+
+Square root `√n` kisi bhi number ka `1` aur `n` ke beech hota hai. Hum binary search se yeh range narrow karte jaate hain:
+
+- `mid * mid <= n` → matlab mid chhota hai ya theek hai → `ans = mid`, aur aage dekho (`first = mid+1`)
+- `mid * mid > n`  → mid zyada bada hai → `last = mid-1`
+
+Har iteration mein range **aadhi** ho jaati hai → `O(log n)` time.
+
+---
+
+**Dono conditions mein fark:**
+
+| | Method 1 | Method 2 |
+|--|----------|----------|
+| Condition | `mid <= floor(n/mid)` | `mid*mid <= n` |
+| Operation | Division | Multiplication |
+| Overflow risk | ✅ Safe (large n pe bhi) | ⚠️ Very large n pe `mid*mid` overflow ho sakta hai |
+| Readability | Thoda confusing | ✅ Seedha samajh aata hai |
+
+**Overflow example (large n):**
+```
+n = 2147483647, mid = 46341
+mid * mid = 2147488281  ← integer overflow ho sakta hai kuch languages mein
+n / mid   = 46340       ← safe rehta hai
+```
+
+JavaScript mein numbers 64-bit float hote hain toh overflow nahi hota practically — lekin Java, C++ mein Method 1 zyada safe hoti hai.
+
+---
+
+**Trace (n=26):**
+
+```
+√26 ≈ 5.09 → integer answer = 5
+
+Step 1: first=1,  last=26, mid=13 → 13*13=169 > 26 → last=12
+Step 2: first=1,  last=12, mid=6  → 6*6=36   > 26 → last=5
+Step 3: first=1,  last=5,  mid=3  → 3*3=9  ≤ 26 → ans=3, first=4
+Step 4: first=4,  last=5,  mid=4  → 4*4=16 ≤ 26 → ans=4, first=5
+Step 5: first=5,  last=5,  mid=5  → 5*5=25 ≤ 26 → ans=5, first=6
+        first(6) > last(5) → loop khatam
+```
+
+**Search space ka narrowing:**
+
+```
+[1 ............... 26]    mid=13 ✗ → right half hatao
+[1 ....... 12]            mid=6  ✗ → right half hatao
+[1 .. 5]                  mid=3  ✓ → ans=3
+   [4 . 5]                mid=4  ✓ → ans=4
+      [5]                 mid=5  ✓ → ans=5 ← FINAL
+```
+
+**`ans` variable kyun chahiye?**
+
+Directly return nahi kar sakte kyunki hume **floor** chahiye — matlab `mid*mid <= n` wali last valid value. `ans` mein hum best valid mid store karte rehte hain, aur loop khatam hone pe return karte hain.
+
+**✅ Output:**
+
+```
+mySqrt(4)   → 2   (√4 = 2.0 exact)
+mySqrt(8)   → 2   (√8 ≈ 2.82, floor = 2)
+mySqrt(9)   → 3   (√9 = 3.0 exact)
+mySqrt(26)  → 5   (√26 ≈ 5.09, floor = 5)
+mySqrt(50)  → 7   (√50 ≈ 7.07, floor = 7)
+mySqrt(100) → 10  (√100 = 10.0 exact)
+```
