@@ -14,7 +14,7 @@ function recursive(n) {
     console.log(n);
     recursive(n - 1);         // ← Khud ko hi call kiya
 }
-
+```
 ## Key Features of Recursion
 
 **1. Base Case (Ruk jaane ki condition)**
