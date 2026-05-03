@@ -738,3 +738,111 @@ if (map.get(i) > 1)   // duplicate: jiska count 2 hai
 Ek hi loop mein **dono answers** nikal aate hain — clean aur efficient! ⚡
 
 ---
+---
+
+## Decode Message using HashMap
+
+**Problem:** Ek encoded message diya gaya hai aur ek mapping bhi — har character ko uske mapped character se replace karo. Spaces waise hi rahenge. Agar character mapping mein nahi hai toh woh bhi waise hi rahega.
+
+```javascript
+class Solution {
+    decodeMessage(mapping, message) {
+        let map = new Map()
+        let arr = []
+
+        // Step 1: mapping object ko Map mein convert karo
+        for (let key in mapping) {
+            map.set(key, mapping[key])
+        }
+
+        // Step 2: message ke har character ko decode karo
+        for (let i = 0; i < message.length; i++) {
+            if (message[i] == ' ') {
+                arr.push(' ')                    // space → space as-is
+            } else if (map.has(message[i])) {
+                arr.push(map.get(message[i]))    // mapping mili → replace karo
+            } else {
+                arr.push(message[i])             // mapping nahi → as-is rakhdo
+            }
+        }
+
+        return arr.join('')
+    }
+}
+```
+
+**Logic — 3 simple steps:**
+
+1. `mapping` object ko `Map` mein daalo — fast lookup ke liye (`O(1)` per lookup)
+2. Message ke har character pe teen cases check karo:
+   - Space hai → seedha space daalo
+   - Map mein hai → mapped value daalo
+   - Map mein nahi → original character daalo
+3. Array ko join karke string return karo
+
+**`for...in` vs `for...of` — yahan kyun `for...in`:**
+
+```javascript
+for (let key in mapping)    // Object ke keys iterate karta hai → 'a','b','c'...
+for (let val of arr)        // Iterable (array/string) ke values iterate karta hai
+```
+
+`mapping` ek plain object hai `{}`, isliye `for...in` use kiya.
+
+---
+
+**Trace (mapping = `{h:'a', e:'b', l:'c', o:'d'}`, message = `"hello world"`):**
+
+Map ban gayi:
+```
+h → a
+e → b
+l → c
+o → d
+```
+
+Character by character decode:
+
+| i | message[i] | Map mein? | arr mein push |
+|---|------------|-----------|---------------|
+| 0 | `h`        | ✅ → `a`  | `a`           |
+| 1 | `e`        | ✅ → `b`  | `b`           |
+| 2 | `l`        | ✅ → `c`  | `c`           |
+| 3 | `l`        | ✅ → `c`  | `c`           |
+| 4 | `o`        | ✅ → `d`  | `d`           |
+| 5 | ` `        | Space!    | ` `           |
+| 6 | `w`        | ❌ nahi   | `w`           |
+| 7 | `o`        | ✅ → `d`  | `d`           |
+| 8 | `r`        | ❌ nahi   | `r`           |
+| 9 | `l`        | ✅ → `c`  | `c`           |
+|10 | `d`        | ❌ nahi   | `d`           |
+
+`arr.join('')` → `"abccd wdrcd"`
+
+---
+
+**Test Cases:**
+
+```javascript
+// Test 1: simple mapping
+mapping = { a:'z', b:'y', c:'x', d:'w' }
+message = 'abcd'
+Output → 'zyxw'
+
+// Test 2: spaces aur unmapped characters ke saath
+mapping = { h:'a', e:'b', l:'c', o:'d' }
+message = 'hello world'
+Output → 'abccd wdrcd'
+
+// Test 3: kuch characters map mein nahi hain
+mapping = { a:'m', b:'n' }
+message = 'abc def'
+Output → 'mnc def'   // c,d,e,f → as-is, space → space
+```
+
+**Time & Space Complexity:**
+
+| | Complexity | Reason |
+|--|-----------|--------|
+| Time | O(n) | message ke n characters ek baar scan |
+| Space | O(k + n) | k = mapping size, n = output array |
