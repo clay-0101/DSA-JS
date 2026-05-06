@@ -496,3 +496,43 @@ mySqrt(26)  → 5   (√26 ≈ 5.09, floor = 5)
 mySqrt(50)  → 7   (√50 ≈ 7.07, floor = 7)
 mySqrt(100) → 10  (√100 = 10.0 exact)
 ```
+
+## 16. Power Function (myPow)
+
+Recursively calculates `n` raised to the power `p`, supports negative exponents. Prints result up to 5 decimal places.
+
+```javascript
+/**
+ * Recursively calculates and prints n raised to the power p
+ * Prints result up to 5 decimal places.
+ * @param {number} n - base
+ * @param {number} p - exponent
+ */
+function solve(n, p) {
+    if (p == 0) return 1
+    let ans = solve(n, Math.floor(p / 2))
+    if (p % 2 == 0) return ans * ans
+    return ans * ans * n
+}
+
+function myPow(n, p) {
+    let result;
+    if (p < 0) {
+        p = -p
+        result = 1 / solve(n, p)
+    } else {
+        result = solve(n, p)
+    }
+    console.log(result.toFixed(5))
+}
+
+module.exports = { myPow };
+```
+
+**Approach:** Fast exponentiation (Divide & Conquer)
+- Base case: `p == 0` → return `1`
+- Recursively solve for `p/2`, then square the result
+- If `p` is odd, multiply once more by `n`
+- For negative exponents, compute `1 / solve(n, -p)`
+- **Time Complexity:** O(log p)
+- **Space Complexity:** O(log p)
