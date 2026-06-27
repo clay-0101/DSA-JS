@@ -34,4 +34,5 @@ the most efficient solutions possible using JavaScript.**
 Each solution is organized by its logic or difficulty to make it easy to revisit and learn from previous implementations.
 
 ---
+
 *Happy Coding! 💻*
