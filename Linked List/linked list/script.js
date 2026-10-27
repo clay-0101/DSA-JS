@@ -59,28 +59,52 @@ class LL {
             return
         }
         this.count--
-        
+
         let temp = this.head
 
-        while(temp.next.next !== null){
+        while (temp.next.next !== null) {
             temp = temp.next
         }
         temp.next = null
     }
-    
-    inserAtPosition(val , p){
-        
-        if(p <= 0 || p > this.count + 1){
+
+    inserAtPosition(val, p) {
+
+        if (p <= 0 || p > this.count + 1) {
             console.log("not possible to be inserted")
             return
         }
-        
+
         let newNode = new Node(val)
 
-        if(p === 1){
+        if (p === 1) {
             newNode.next = this.head
             this.head = newNode
             this.count++
+            return
+        }
+
+        let temp = this.head
+
+        for (let i = 1; i < p - 1; i++) {
+            temp = temp.next
+        }
+
+        newNode.next = temp.next
+        temp.next = newNode
+        this.count++
+    }
+
+    deleteAtPosition(p) {
+
+        if (p <= 0 || p > this.count) {
+            console.log("not possible to be inserted")
+            return
+        }
+
+        if(p === 1){
+            this.head = this.head.next
+            this.count--
             return
         }
 
@@ -90,11 +114,10 @@ class LL {
             temp = temp.next
         }
 
-        newNode.next = temp.next
-        temp.next = newNode
-        this.count++
-    }
+        temp.next = temp.next.next
+        this.count--
 
+    }
 
     printLL(head) {
 
@@ -126,7 +149,8 @@ ll.insertAtLast(50)
 // ll.deleteAtLast()
 // ll.deleteAtLast()
 
-ll.inserAtPosition(35, 1)
+ll.inserAtPosition(35, 6)
 
+ll.deleteAtPosition(7)
 
 ll.printLL(ll.head)
